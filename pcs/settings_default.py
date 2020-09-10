@@ -1,3 +1,4 @@
+import multiprocessing
 import os.path
 
 systemctl_binary = "/bin/systemctl"
@@ -96,3 +97,13 @@ pcsd_gem_path = "vendor/bundle/ruby"
 ruby_executable = "/usr/bin/ruby"
 
 gui_session_lifetime_seconds = 60 * 60
+
+# Scheduler settings
+async_api_scheduler_enable = False
+async_api_scheduler_interval_ms = 300
+
+worker_count = multiprocessing.cpu_count()
+worker_task_limit = 5
+
+task_unresponsive_timeout_seconds = 60 * 60
+task_abandoned_timeout_seconds = 1 * 60
