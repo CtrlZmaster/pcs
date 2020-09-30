@@ -2,11 +2,13 @@ from typing import (
     Any,
     Iterable,
     Dict,
+    List,
     Type,
     TypeVar,
     Union,
 )
 from dataclasses import asdict, is_dataclass
+from enum import Enum
 import dacite
 
 from pcs.common import types
@@ -36,7 +38,9 @@ def to_dict(obj: DataTransferObject) -> DtoPayload:
 DtoType = TypeVar("DtoType", bound=DataTransferObject)
 
 
-def from_dict(cls: Type[DtoType], data: DtoPayload) -> DtoType:
+def from_dict_unconfigured(
+    cls: Type[DtoType], data: DtoPayload, cast_config: List[Type[Enum]],
+) -> DtoType:
     return dacite.from_dict(
         data_class=cls,
         data=data,
@@ -53,6 +57,16 @@ def from_dict(cls: Type[DtoType], data: DtoPayload) -> DtoType:
             ]
         ),
     )
+
+
+def from_dict(cls: Type[DtoType], data: DtoPayload) -> DtoType:
+    cast_config: List[Type[Enum]] = [
+        types.CibNvsetType,
+        types.CibRuleExpressionType,
+        types.DrRole,
+        types.ResourceRelationType,
+    ]
+    return from_dict_unconfigured(cls, data, cast_config)
 
 
 class ImplementsToDto:
