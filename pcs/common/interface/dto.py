@@ -36,7 +36,9 @@ def to_dict(obj: DataTransferObject) -> DtoPayload:
 DtoType = TypeVar("DtoType", bound=DataTransferObject)
 
 
-def from_dict(cls: Type[DtoType], data: DtoPayload) -> DtoType:
+def from_dict(
+    cls: Type[DtoType], data: DtoPayload, strict: bool = False
+) -> DtoType:
     return dacite.from_dict(
         data_class=cls,
         data=data,
@@ -50,7 +52,10 @@ def from_dict(cls: Type[DtoType], data: DtoPayload) -> DtoType:
                 types.CorosyncTransportType,
                 types.DrRole,
                 types.ResourceRelationType,
-            ]
+                types.TaskFinishType,
+                types.TaskState,
+            ],
+            strict=strict,
         ),
     )
 
