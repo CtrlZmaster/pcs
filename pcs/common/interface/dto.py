@@ -9,6 +9,7 @@ from typing import (
 from dataclasses import asdict, is_dataclass
 import dacite
 
+import pcs.common.async_tasks.types as async_tasks_types
 from pcs.common import types
 
 
@@ -52,8 +53,9 @@ def from_dict(
                 types.CorosyncTransportType,
                 types.DrRole,
                 types.ResourceRelationType,
-                types.TaskFinishType,
-                types.TaskState,
+                async_tasks_types.TaskFinishType,
+                async_tasks_types.TaskState,
+                async_tasks_types.TaskKillOrigin,
             ],
             strict=strict,
         ),
