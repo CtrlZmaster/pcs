@@ -54,7 +54,7 @@ def signal_handler(sig, frame):
 
 # REQUEST FUNCTIONS
 def _handle_api_error(curl: pycurl.Curl, response: str) -> None:
-    if curl.getinfo(pycurl.RESPONSE_CODE) != 200:
+    if curl.getinfo(pycurl.RESPONSE_CODE) not in [200, 201, 202]:
         try:
             error_response = json.loads(response)
             error(error_response.error_message)
@@ -67,7 +67,7 @@ def _handle_api_error(curl: pycurl.Curl, response: str) -> None:
 
 def _make_api_request(endpoint) -> pycurl.Curl:
     curl = pycurl.Curl()
-    curl.setopt(pycurl.URL, f"https://localhost:2224/async_api/{endpoint}")
+    curl.setopt(pycurl.URL, f"https://localhost:2224/async/{endpoint}")
     curl.setopt(pycurl.SSL_VERIFYPEER, 0)
     curl.setopt(pycurl.SSL_VERIFYHOST, 0)
     return curl

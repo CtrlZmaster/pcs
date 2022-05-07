@@ -77,6 +77,10 @@ class BaseAPIHandler(RequestHandler):
         """JSON preprocessing"""
         # pylint: disable=attribute-defined-outside-init
         self.add_header("Content-Type", "application/json")
+
+        if self.request.method == "GET":
+            return
+
         if (
             "Content-Type" in self.request.headers
             and self.request.headers["Content-Type"] == "application/json"
@@ -87,6 +91,12 @@ class BaseAPIHandler(RequestHandler):
                 raise APIError(
                     http_code=400, error_msg="Malformed JSON data."
                 ) from exc
+        else:
+            raise APIError(
+                http_code=415,
+                error_msg="The 'Content-Type' request header must be set to "
+                "'application/json'.",
+            )
 
     @staticmethod
     def _from_dict_exc_handled(
@@ -103,14 +113,14 @@ class BaseAPIHandler(RequestHandler):
         except MissingValueError as exc:
             raise APIError(
                 http_code=400,
-                error_msg=f'Required key "{exc.field_path}" is missing in '
+                error_msg=f"Required key '{exc.field_path}' is missing in "
                 f"request body.",
             ) from exc
         except UnexpectedDataError as exc:
             raise APIError(
                 http_code=400,
                 error_msg=f"Request body contains unexpected keys: "
-                f"{', '.join(exc.keys)}.",
+                f"'{', '.join(exc.keys)}'.",
             ) from exc
         except DaciteError as exc:
             raise APIError(
@@ -160,6 +170,9 @@ class NewTaskHandler(BaseAPIHandler):
         task_ident = self.scheduler.new_task(command_dto)
         self.write(json.dumps(to_dict(TaskIdentDto(task_ident))))
 
+        self.set_status(201)  # Resource (task) created
+        self.finish()
+
 
 class TaskInfoHandler(BaseAPIHandler):
     """Get task status"""
@@ -199,7 +212,7 @@ class KillTaskHandler(BaseAPIHandler):
                 http_code=404,
                 error_msg="Task with this identifier does not exist.",
             ) from exc
-        self.set_status(200)
+        self.set_status(202)  # Accepted, asynchronous action (kill) started
         self.finish()
 
 
@@ -213,7 +226,7 @@ def get_routes(
     """
     params = dict(scheduler=scheduler)
     return [
-        ("/async_api/task/result", TaskInfoHandler, params),
-        ("/async_api/task/create", NewTaskHandler, params),
-        ("/async_api/task/kill", KillTaskHandler, params),
+        ("/async/task/result", TaskInfoHandler, params),
+        ("/async/task/create", NewTaskHandler, params),
+        ("/async/task/kill", KillTaskHandler, params),
     ]
