@@ -115,6 +115,7 @@ setup(
             "pcsd = pcs.entry_points.daemon:main",
             "pcs_snmp_agent = pcs.entry_points.snmp_agent:main",
             "pcs_internal = pcs.entry_points.internal:main",
+            "pcs_async" = pcs.entry_points.async:main",
         ],
     },
     cmdclass={
