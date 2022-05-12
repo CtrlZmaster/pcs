@@ -36,7 +36,7 @@ def worker_init(message_q: mp.Queue, logging_q: mp.Queue) -> None:
     """
     # Create and configure new logger
     logger = setup_worker_logger(logging_q)
-    logger.info("Worker initialized.")
+    logger.info("Worker#%d:: Initialized.", os.getpid())
 
     # Let task_executor use worker_com for sending messages to the scheduler
     global worker_com
@@ -51,7 +51,9 @@ def worker_init(message_q: mp.Queue, logging_q: mp.Queue) -> None:
 
 def pause_worker() -> None:
     getLogger("pcs_worker").debug(
-        "Pausing worker until the scheduler updates status of this task."
+        "Worker#%d: Pausing until the scheduler updates status "
+        "of this task.",
+        os.getpid(),
     )
     os.kill(os.getpid(), signal.SIGSTOP)
 
@@ -62,15 +64,16 @@ def task_executor(task: WorkerCommand) -> None:
     :param task: Task identifier, command and parameter object
     """
     logger = getLogger("pcs_worker")
+    pid = os.getpid()
 
     global worker_com  # pylint: disable=global-variable-not-assigned
     worker_com.put(
         Message(
             task.task_ident,
-            TaskExecuted(os.getpid()),
+            TaskExecuted(pid),
         )
     )
-    logger.info("Task %s executed.", task.task_ident)
+    logger.info("Worker#%d: Task %s executed.", pid, task.task_ident)
 
     env = LibraryEnvironment(  # type: ignore
         logger,
@@ -95,7 +98,11 @@ def task_executor(task: WorkerCommand) -> None:
                 TaskFinished(TaskFinishType.FAIL, None),
             )
         )
-        logger.exception("Task %s raised a LibraryException.", task.task_ident)
+        logger.exception(
+            "Worker#%d: Task %s raised a LibraryException.",
+            pid,
+            task.task_ident,
+        )
         pause_worker()
         return
     except Exception:  # pylint: disable=broad-except
@@ -107,7 +114,9 @@ def task_executor(task: WorkerCommand) -> None:
             )
         )
         logger.exception(
-            "Task %s raised an unhandled exception.", task.task_ident
+            "Worker#%d: Task %s raised an unhandled exception.",
+            pid,
+            task.task_ident,
         )
         pause_worker()
         return
@@ -117,5 +126,5 @@ def task_executor(task: WorkerCommand) -> None:
             TaskFinished(TaskFinishType.SUCCESS, task_retval),
         )
     )
-    logger.info("Task %s finished.", task.task_ident)
+    logger.info("Worker#%d: Task %s finished.", pid, task.task_ident)
     pause_worker()
