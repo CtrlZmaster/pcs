@@ -83,7 +83,7 @@ BuildRequires: ruby-devel
 BuildRequires: rubygems
 # cluster stack packages for pkg-config
 BuildRequires: booth
-BuildRequires: corosync-qdevice-devel
+# BuildRequires: corosync-qdevice-devel
 BuildRequires: corosynclib-devel >= 3.0
 BuildRequires: fence-agents-common
 %if 0%{?suse_version}
