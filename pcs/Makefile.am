@@ -183,6 +183,7 @@ EXTRA_DIST		= \
 			  daemon/session.py \
 			  daemon/ssl.py \
 			  daemon/systemd.py \
+			  entry_points/async.py \
 			  entry_points/cli.py \
 			  entry_points/common.py \
 			  entry_points/daemon.py \
