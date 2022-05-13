@@ -283,6 +283,7 @@ sed -i -e 's#^@#%#g' dynamic_files/pcs-snmp
 %license COPYING
 
 # pcs
+%{_sbindir}/pcs_async
 %{_sbindir}/pcs
 %{python3_sitelib}/*
 %{_libdir}/pcs/*
