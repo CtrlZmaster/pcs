@@ -64,7 +64,9 @@ BuildRequires: platform-python-setuptools
 BuildRequires: python3-setuptools_scm
 %endif
 
+BuildRequires: python3-setuptools_scm
 BuildRequires: python3-devel
+BuildRequires: python3-pip
 # for tier0 tests
 BuildRequires: python3-cryptography
 BuildRequires: python3-pyparsing
@@ -81,6 +83,25 @@ BuildRequires: libffi-devel
 BuildRequires: ruby >= 2.5
 BuildRequires: ruby-devel
 BuildRequires: rubygems
+BuildRequires: rubygem-bundler
+BuildRequires: rubygem-power_assert
+BuildRequires: rubygem-backports
+BuildRequires: rubygem-daemons
+BuildRequires: rubygem-ethon
+BuildRequires: rubygem-eventmachine
+BuildRequires: rubygem-ffi
+BuildRequires: rubygem-io-console
+BuildRequires: rubygem-json
+BuildRequires: rubygem-mustermann
+BuildRequires: rubygem-open4
+BuildRequires: rubygem-rack
+BuildRequires: rubygem-rack-protection
+BuildRequires: rubygem-rack-test
+BuildRequires: rubygem-sinatra
+BuildRequires: rubygem-tilt
+BuildRequires: rubygem(rexml)
+BuildRequires: rubygem(webrick)
+BuildRequires: rubygem-test-unit
 # cluster stack packages for pkg-config
 BuildRequires: booth
 # BuildRequires: corosync-qdevice-devel
@@ -103,6 +124,21 @@ Requires: python3-pyparsing
 # ruby and gems for pcsd
 Requires: ruby >= 2.5
 Requires: rubygems
+Requires: rubygem-backports
+Requires: rubygem-daemons
+Requires: rubygem-ethon
+Requires: rubygem-eventmachine
+Requires: rubygem-ffi
+Requires: rubygem-json
+Requires: rubygem-mustermann
+Requires: rubygem-open4
+Requires: rubygem-rack
+Requires: rubygem-rack-protection
+Requires: rubygem-rack-test
+Requires: rubygem-sinatra
+Requires: rubygem-tilt
+Requires: rubygem(rexml)
+Requires: rubygem(webrick)
 # for killall
 Requires: psmisc
 # cluster stack and related packages
@@ -283,8 +319,8 @@ sed -i -e 's#^@#%#g' dynamic_files/pcs-snmp
 %license COPYING
 
 # pcs
-%{_sbindir}/pcs_async
 %{_sbindir}/pcs
+%{_sbindir}/pcs_async
 %{python3_sitelib}/*
 %{_libdir}/pcs/*
 %exclude %{_libdir}/pcs/pcs_snmp_agent
