@@ -188,7 +188,7 @@ class TaskInfoHandler(BaseAPIHandler):
         except MissingArgumentError as exc:
             raise APIError(
                 http_code=400,
-                error_msg=f'URL argument "{exc.arg_name}" is missing.',
+                error_msg=f"URL argument '{exc.arg_name}' is missing.",
             ) from exc
         except TaskNotFoundError as exc:
             raise APIError(
