@@ -16,7 +16,6 @@ from typing import (
 import dacite
 
 from pcs.common import types
-from pcs.common.async_tasks import dto as async_tasks_dto
 from pcs.common.async_tasks import types as async_tasks_types
 
 PrimitiveType = Union[str, int, float, bool, None]
@@ -122,7 +121,6 @@ def from_dict(
                 async_tasks_types.TaskFinishType,
                 async_tasks_types.TaskState,
                 async_tasks_types.TaskKillReason,
-                async_tasks_dto.CommandDto,
             ],
             strict=strict,
         ),
