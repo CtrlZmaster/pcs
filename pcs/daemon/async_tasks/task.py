@@ -18,6 +18,7 @@ from pcs.common.async_tasks.types import (
 )
 from pcs.common.interface.dto import ImplementsToDto
 from pcs.common.reports.dto import ReportItemDto
+from pcs.daemon.log import pcsd as pcsd_logger
 from pcs.settings import (
     task_abandoned_timeout_seconds,
     task_unresponsive_timeout_seconds,
@@ -209,6 +210,11 @@ class Task(ImplementsToDto):
         self._result = message_payload.result
         self._state = TaskState.FINISHED
         self._task_finish_type = message_payload.task_finish_type
+        pcsd_logger.debug(
+            "Acknowledge TaskFinished message from worker#%d. "
+            "The worker can continue.",
+            self._worker_pid,
+        )
         os.kill(self._worker_pid, signal.SIGCONT)
 
     def _store_reports(self, message_payload: ReportItemDto) -> None:

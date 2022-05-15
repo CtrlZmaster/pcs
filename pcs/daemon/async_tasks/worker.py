@@ -36,7 +36,7 @@ def worker_init(message_q: mp.Queue, logging_q: mp.Queue) -> None:
     """
     # Create and configure new logger
     logger = setup_worker_logger(logging_q)
-    logger.info("Worker#%d:: Initialized.", os.getpid())
+    logger.info("Worker#%d: Initialized.", os.getpid())
 
     # Let task_executor use worker_com for sending messages to the scheduler
     global worker_com
@@ -51,8 +51,8 @@ def worker_init(message_q: mp.Queue, logging_q: mp.Queue) -> None:
 
 def pause_worker() -> None:
     getLogger("pcs_worker").debug(
-        "Worker#%d: Pausing until the scheduler updates status "
-        "of this task.",
+        "Worker#%d: Pausing until the scheduler acknowledges the TaskFinished "
+        "message.",
         os.getpid(),
     )
     os.kill(os.getpid(), signal.SIGSTOP)
