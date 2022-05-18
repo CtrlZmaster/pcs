@@ -70,7 +70,6 @@ class BaseAPIHandler(RequestHandler):
         # pylint: disable=attribute-defined-outside-init
         self.scheduler = scheduler
         self.json: Optional[Dict[str, Any]] = None
-        # TODO: Turn into a constant
         self.logger: logging.Logger = logging.getLogger("pcs_scheduler")
 
     def prepare(self) -> None:
