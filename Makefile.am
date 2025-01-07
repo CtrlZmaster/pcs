@@ -195,21 +195,33 @@ install-exec-local: install_python_embedded_mods stamps/install_ruby_deps_local
 		mv ${DESTDIR}/$(prefix)/local/bin/pcs_snmp_agent ${DESTDIR}/${LIB_DIR}/pcs/
 
 # * Uses PEP627 RECORD file - CSV, first column is a path relative to dist-info
-# * Before uninstallation, the manually moved scripts need to go back where pip
-# installed them - that's what's written in the RECORD file
+# * Before uninstallation, the manually moved scripts are deleted and not moved
+# to the original paths in the RECORD file. This is done because pcs installs
+# into different directories under different distros and the original location
+# cannot be determined easily.
 # * RECORD file only contains files not directories - deleting empty directory
 # tree by find is needed afterwards
 # * dist-info folder needs to be deleted for the same reason, pip uses it to
 # detect installed packages and if it's empty, pip reports error on every run
+# * On some distros (Debian-like), pcs is installed into /usr/local and the
+# uninstall also needs to# handle that case. First we try to unistall the
+# ${prefix}/local and only if nothing is therem we try to unistall from the
+# system. This is to prevent messing up system installation in these ditros
+# which is untouched by make install.
 uninstall-local:
 	rm -rf ${DESTDIR}/$(PCS_BUNDLED_DIR)
-	mv ${DESTDIR}/$(SBINDIR)/pcs ${DESTDIR}/$(prefix)/bin || :
-	mv ${DESTDIR}/$(SBINDIR)/pcsd ${DESTDIR}/$(prefix)/bin || :
-	mv ${DESTDIR}/$(LIB_DIR)/pcs/pcs_internal ${DESTDIR}/$(prefix)/bin || :
-	mv ${DESTDIR}/$(LIB_DIR)/pcs/pcs_snmp_agent ${DESTDIR}/$(prefix)/bin || :
-	recordfile=$$(echo ${DESTDIR}/$(PYTHON_SITELIB)/pcs*.dist-info/RECORD); \
+	rm -fv ${DESTDIR}/$(SBINDIR)/pcs
+	rm -fv ${DESTDIR}/$(SBINDIR)/pcsd
+	rm -fv ${DESTDIR}/$(LIB_DIR)/pcs/pcs_internal
+	rm -fv ${DESTDIR}/$(LIB_DIR)/pcs/pcs_snmp_agent
+	sitelib=${DESTDIR}/${prefix}/local/lib/python*; \
+	recordfile=$$(echo $${sitelib}/pcs*.dist-info/RECORD); \
+	if test -n "$$recordfile"; then \
+		sitelib=${DESTDIR}/$(PYTHON_SITELIB); \
+		recordfile=$$(echo $${sitelib}/pcs*.dist-info/RECORD); \
+	fi; \
 	while read fname; do \
-	  rm -rf $$(echo "${DESTDIR}/$(PYTHON_SITELIB)/$$fname" | cut -d',' -f1); \
+	  rm -rf $$(echo "$$sitelib/$$fname" | cut -d',' -f1); \
 	done < $$recordfile
 	if test -n "${DESTDIR}" || test "${prefix}" != "/usr"; then \
 		rmdir ${DESTDIR}/$(SBINDIR); \
@@ -217,7 +229,9 @@ uninstall-local:
 	find ${DESTDIR}/$(LIB_DIR)/pcs -empty -type d -delete
 	find ${DESTDIR}/$(LIB_DIR)/pcsd -empty -type d -delete
 	find ${DESTDIR}/${PYTHON_SITELIB}/pcs -empty -type d -delete
+	find ${DESTDIR}/${prefix}/local/lib/python*/pcs -empty -type d -delete
 	rmdir ${DESTDIR}/$(PYTHON_SITELIB)/pcs*.dist-info
+	rmdir ${DESTDIR}/${prefix}/local/lib/python*/pcs*.dist-info
 
 dist_doc_DATA	= README.md CHANGELOG.md
 
