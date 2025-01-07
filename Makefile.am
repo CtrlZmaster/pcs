@@ -214,7 +214,7 @@ uninstall-local:
 	rm -fv ${DESTDIR}/$(SBINDIR)/pcsd
 	rm -fv ${DESTDIR}/$(LIB_DIR)/pcs/pcs_internal
 	rm -fv ${DESTDIR}/$(LIB_DIR)/pcs/pcs_snmp_agent
-	sitelib=${DESTDIR}/${prefix}/local/lib/python*; \
+	sitelib=${DESTDIR}/${prefix}/local/lib/python*/dist-packages; \
 	recordfile=$$(echo $${sitelib}/pcs*.dist-info/RECORD); \
 	if test -n "$$recordfile"; then \
 		sitelib=${DESTDIR}/$(PYTHON_SITELIB); \
@@ -229,9 +229,9 @@ uninstall-local:
 	find ${DESTDIR}/$(LIB_DIR)/pcs -empty -type d -delete
 	find ${DESTDIR}/$(LIB_DIR)/pcsd -empty -type d -delete
 	find ${DESTDIR}/${PYTHON_SITELIB}/pcs -empty -type d -delete
-	find ${DESTDIR}/${prefix}/local/lib/python*/pcs -empty -type d -delete
+	find ${DESTDIR}/${prefix}/local/lib/python*/dist-packages/pcs -empty -type d -delete
 	rmdir ${DESTDIR}/$(PYTHON_SITELIB)/pcs*.dist-info
-	rmdir ${DESTDIR}/${prefix}/local/lib/python*/pcs*.dist-info
+	rmdir ${DESTDIR}/${prefix}/local/lib/python*/dist-packages/pcs*.dist-info
 
 dist_doc_DATA	= README.md CHANGELOG.md
 
