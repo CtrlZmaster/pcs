@@ -168,8 +168,11 @@ endif
 # * Pip installs scripts into bin directory and that cannot be changed, so the
 # files are moved manually. Some of the folders do not exist in DESTDIR or
 # prefix locations, so they need to be created first, otherwise mv fails
+# * Installations outside of rpm buildroot are considered user installations
+# and they are put into /usr/local. Only rpmbuild can enforce modifying the
+# system by setting RPM_BUILD_ROOT
 install-exec-local: install_python_embedded_mods stamps/install_ruby_deps_local
-	if $$(python -c "import sys; exit(sys.base_prefix == sys.prefix)"); then \
+	if $$(${PYTHON} -c "import sys; exit(sys.base_prefix == sys.prefix)"); then \
 		echo "WARNING: Virtual environment is activated, shebangs in Python " \
 		"entry points will point to this virtual environment. Fix shebangs " \
 		"manually to use the system interpreter. Entry points in rpm will be " \
@@ -181,11 +184,15 @@ install-exec-local: install_python_embedded_mods stamps/install_ruby_deps_local
 	fi
 	${PIP} ${pipopts} install ${pipinstallopts} \
 		--root=$(or ${DESTDIR}, /) \
-		--prefix=${prefix} ${EXTRA_SETUP_OPTS} .
-	mv ${DESTDIR}/$(prefix)/bin/pcs ${DESTDIR}/$(SBINDIR)/
-	mv ${DESTDIR}/$(prefix)/bin/pcsd ${DESTDIR}/$(SBINDIR)/
-	mv ${DESTDIR}/$(prefix)/bin/pcs_internal ${DESTDIR}/$(LIB_DIR)/pcs/
-	mv ${DESTDIR}/$(prefix)/bin/pcs_snmp_agent ${DESTDIR}/$(LIB_DIR)/pcs/
+		--prefix=${prefix} ${EXTRA_SETUP_OPTS} . ; \
+	mv ${DESTDIR}/$(prefix)/bin/pcs ${DESTDIR}/$(SBINDIR)/ || \
+		mv ${DESTDIR}/$(prefix)/local/bin/pcs ${DESTDIR}/${prefix}/local/sbin/
+	mv ${DESTDIR}/$(prefix)/bin/pcsd ${DESTDIR}/$(SBINDIR)/ || \
+		mv ${DESTDIR}/$(prefix)/local/bin/pcsd ${DESTDIR}/${prefix}/local/sbin/
+	mv ${DESTDIR}/$(prefix)/bin/pcs_internal ${DESTDIR}/$(LIB_DIR)/pcs/ || \
+		mv ${DESTDIR}/$(prefix)/local/bin/pcs_internal ${DESTDIR}/${LIB_DIR}/pcs/
+	mv ${DESTDIR}/$(prefix)/bin/pcs_snmp_agent ${DESTDIR}/$(LIB_DIR)/pcs/ || \
+		mv ${DESTDIR}/$(prefix)/local/bin/pcs_snmp_agent ${DESTDIR}/${LIB_DIR}/pcs/
 
 # * Uses PEP627 RECORD file - CSV, first column is a path relative to dist-info
 # * Before uninstallation, the manually moved scripts need to go back where pip
