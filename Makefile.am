@@ -182,6 +182,7 @@ install-exec-local: install_python_embedded_mods stamps/install_ruby_deps_local
 	if test -n "${DESTDIR}" || test "${prefix}" != "/usr"; then \
 		$(MKDIR_P) ${DESTDIR}/$(LIB_DIR)/pcs/; \
 		$(MKDIR_P) ${DESTDIR}/$(SBINDIR); \
+		$(MKDIR_P) ${DESTDIR}/${prefix}/local/sbin/; \
 	fi
 	${PIP} ${pipopts} install ${pipinstallopts} \
 		--root=$(or ${DESTDIR}, /) \
